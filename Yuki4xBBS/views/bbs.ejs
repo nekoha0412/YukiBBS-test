@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lusitana:wght@400;700&display=swap" rel="stylesheet">
+    <title>掲示板/YukiBBS</title>
+    <style>
+        body {
+            user-select: text; /* テキスト選択を許可 */
+        }
+
+        #message {
+            width: 36.7%;
+            height: 75px;
+            font-size: 10px;
+        }
+
+        #error-message {
+            color: blue;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .seed-toggle-button {
+            cursor: pointer;
+            color: #007bff;
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        function getCookie(name) {
+            const cookies = document.cookie.split("; ");
+            for (let i = 0; i < cookies.length; i++) {
+                const [key, value] = cookies[i].split("=");
+                if (key === name) {
+                    return decodeURIComponent(value);
+                }
+            }
+            return "";
+        }
+
+        function setCookie(name, value, days = 30) {
+            const date = new Date();
+            date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${date.toUTCString()}; path=/`;
+        }
+
+        function linkify(text) {
+            const urlPattern = /(https?:\/\/|ttps:\/\/)([^\s<>]+)/g;
+            return text.replace(urlPattern, function(match) {
+                const fixedUrl = match.startsWith("ttps://") ? "h" + match : match;
+                return `<a href="${fixedUrl}" target="_blank" rel="noopener noreferrer">${fixedUrl}</a>`;
+            });
+        }
+
+        async function fetchBBS() {
+            const channel = document.getElementById("channel").value;
+            const verify = document.getElementById("verify").checked ? "true" : "false";
+            const t = Date.now();
+
+            try {
+                const response = await fetch(`/bbs/api?t=${t}&channel=${channel}&verify=${verify}`);
+                let data = await response.text();
+
+                data = linkify(data);
+                document.getElementById("bbs-content").innerHTML = data;
+            } catch (error) {
+                console.error("Error fetching BBS:", error);
+                document.getElementById("bbs-content").innerHTML = "エラーが発生しました";
+            }
+        }
+
+        async function sendMessage(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const message = document.getElementById("message").value.trim();
+            const seed = document.getElementById("seed").value;
+            const channel = document.getElementById("channel").value;
+            const verify = document.getElementById("verify").checked ? "true" : "false";
+
+            if (!name || !seed) {
+                showErrorMessage("名前/シードは必須です");
+                return;
+            }
+
+            if (message === "") {
+                showErrorMessage("メッセージを入力してください");
+                return;
+            }
+
+            clearErrorMessage();
+            document.getElementById("message").value = "";
+
+            setCookie("name", name);
+            setCookie("seed", seed);
+
+            const base64Message = btoa(unescape(encodeURIComponent(message)));
+
+            try {
+                await fetch(`/bbs/result?name=${encodeURIComponent(name)}&message=${encodeURIComponent(base64Message)}&seed=${encodeURIComponent(seed)}&channel=${encodeURIComponent(channel)}&verify=${encodeURIComponent(verify)}`, {
+                    method: 'GET'
+                });
+                fetchBBS();
+            } catch (error) {
+                console.error("Error sending message:", error);
+                document.getElementById("bbs-content").innerHTML = "メッセージ送信に失敗しました";
+            }
+        }
+
+        function showErrorMessage(message) {
+            document.getElementById("error-message").textContent = message;
+            setTimeout(clearErrorMessage, 3000);
+        }
+
+        function clearErrorMessage() {
+            document.getElementById("error-message").textContent = "";
+        }
+
+        function handleKeyPress(event) {
+            if (document.getElementById("enter-send").checked && event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage(event);
+            }
+        }
+
+        function toggleSeedVisibility() {
+            const seedInput = document.getElementById("seed");
+            seedInput.type = (seedInput.type === "password") ? "text" : "password";
+        }
+
+        function changeFont() {
+            const selectedFont = document.getElementById("font-selector").value;
+            if (selectedFont === "default") {
+                document.body.style.fontFamily = "";
+                localStorage.removeItem("selectedFont");
+            } else {
+                document.body.style.fontFamily = selectedFont;
+                localStorage.setItem("selectedFont", selectedFont);
+            }
+        }
+
+        window.onload = function() {
+            const savedName = getCookie("name");
+            const savedSeed = getCookie("seed");
+            const savedFont = localStorage.getItem("selectedFont");
+
+            if (savedName) document.getElementById("name").value = savedName;
+            if (savedSeed) document.getElementById("seed").value = savedSeed;
+            window.onload = function() {
+    const savedName = getCookie("name");
+    const savedSeed = getCookie("seed");
+    const savedFont = localStorage.getItem("selectedFont");
+
+    if (savedName) document.getElementById("name").value = savedName;
+    if (savedSeed) document.getElementById("seed").value = savedSeed;
+    
+    if (savedFont) {
+        document.body.style.fontFamily = savedFont;
+        document.getElementById("font-selector").value = savedFont;
+    } else {
+        document.getElementById("font-selector").value = "default";
+        document.body.style.fontFamily = "";
+    }
+
+    fetchBBS();
+    setInterval(fetchBBS, 5000);
+};
+
+
+            fetchBBS();
+            setInterval(fetchBBS, 5000);
+        };
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("channel").addEventListener("change", fetchBBS);
+            document.getElementById("send-button").addEventListener("click", sendMessage);
+            document.getElementById("message").addEventListener("keydown", handleKeyPress);
+            document.getElementById("toggle-seed-button").addEventListener("click", toggleSeedVisibility);
+            document.getElementById("font-selector").addEventListener("change", changeFont);
+        });
+    </script>
+</head>
+<body>
+    <h1>掲示板</h1>
+
+    <!-- フォント選択 -->
+    <label for="channel">チャンネル</label>
+    <select name="channel" id="channel">
+        <option value="main">雑談</option>
+        <option value="battle">バトスタ</option>
+    </select>
+        <label for="font-selector">フォント</label>
+    <select id="font-selector">
+        <option value="default">Default</option>
+        <option value="Arial, Helvetica, sans-serif">Arial</option>
+        <option value="Verdana, sans-serif">Verdana</option>
+        <option value="Georgia, sans-serif">Georgia</option>
+        <option value="Courier New, monospace, sans-serif">Courier New</option>
+        <option value="Lusitana, sans-serif">Lusitana</option>
+        
+    </select>
+    <label for="verify">スピ限</label>
+    <input type="checkbox" id="verify" name="verify">
+    <label for="enter-send">Enterで送信</label>
+    <input type="checkbox" id="enter-send" name="enter-send">
+    <br>
+    <label for="name">名前</label>
+    <input type="text" id="name" name="name" placeholder="名前を入力" required>
+    <label for="seed">シード</label>
+    <input type="password" id="seed" name="seed" placeholder="シード(パスワード)" required>
+    <button type="button" id="toggle-seed-button" class="seed-toggle-button">シードを表示/非表示</button>
+    <br><br>
+    <textarea id="message" name="message" placeholder="メッセージを入力" required></textarea>
+    <br>
+    <button type="button" id="send-button">メッセージを送信</button>
+
+    <div id="error-message"></div>
+    <div id="bbs-content">
+        <p>更新待機中...</p>
+    </div>
+</body>
+</html>
