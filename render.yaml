@@ -4,5 +4,5 @@ services:
     env: python
     region: Singapore
     plan: free
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "uvicorn --port $PORT --host 0.0.0.0 main:app"
+    buildCommand: "npm install"
+    startCommand: "node server.js"
