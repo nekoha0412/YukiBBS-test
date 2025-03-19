@@ -144,13 +144,6 @@
         }
 
         window.onload = function() {
-            const savedName = getCookie("name");
-            const savedSeed = getCookie("seed");
-            const savedFont = localStorage.getItem("selectedFont");
-
-            if (savedName) document.getElementById("name").value = savedName;
-            if (savedSeed) document.getElementById("seed").value = savedSeed;
-            window.onload = function() {
     const savedName = getCookie("name");
     const savedSeed = getCookie("seed");
     const savedFont = localStorage.getItem("selectedFont");
@@ -169,23 +162,20 @@
     fetchBBS();
     setInterval(fetchBBS, 5000);
 };
-    fetchBBS();
-    setInterval(fetchBBS, 5000);
-};
 
-        document.addEventListener("DOMContentLoaded", function() {
-            document.getElementById("channel").addEventListener("change", fetchBBS);
-            document.getElementById("send-button").addEventListener("click", sendMessage);
-            document.getElementById("message").addEventListener("keydown", handleKeyPress);
-            document.getElementById("toggle-seed-button").addEventListener("click", toggleSeedVisibility);
-            document.getElementById("font-selector").addEventListener("change", changeFont);
-        });
-    </script>
+   document.addEventListener("DOMContentLoaded", function() {
+   document.getElementById("channel").addEventListener("change", fetchBBS);
+   document.getElementById("send-button").addEventListener("click", sendMessage);
+   document.getElementById("message").addEventListener("keydown", handleKeyPress);
+   document.getElementById("toggle-seed-button").addEventListener("click", toggleSeedVisibility);
+   document.getElementById("font-selector").addEventListener("change", changeFont);
+  });
+
+ </script>
 </head>
 <body>
     <h1>掲示板</h1>
-
-    <!-- フォント選択 -->
+  
     <label for="channel">チャンネル</label>
     <select name="channel" id="channel">
         <option value="main">雑談</option>
