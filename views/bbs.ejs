@@ -170,11 +170,6 @@
     setInterval(fetchBBS, 5000);
 };
 
-
-            fetchBBS();
-            setInterval(fetchBBS, 5000);
-        };
-
         document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("channel").addEventListener("change", fetchBBS);
             document.getElementById("send-button").addEventListener("click", sendMessage);
