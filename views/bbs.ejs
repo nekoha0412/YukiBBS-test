@@ -163,15 +163,15 @@
     setInterval(fetchBBS, 5000);
 };
 
-   document.addEventListener("DOMContentLoaded", function() {
-   document.getElementById("channel").addEventListener("change", fetchBBS);
-   document.getElementById("send-button").addEventListener("click", sendMessage);
-   document.getElementById("message").addEventListener("keydown", handleKeyPress);
-   document.getElementById("toggle-seed-button").addEventListener("click", toggleSeedVisibility);
-   document.getElementById("font-selector").addEventListener("change", changeFont);
-  });
+    document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("channel").addEventListener("change", fetchBBS);
+    document.getElementById("send-button").addEventListener("click", sendMessage);
+    document.getElementById("message").addEventListener("keydown", handleKeyPress);
+    document.getElementById("toggle-seed-button").addEventListener("click", toggleSeedVisibility);
+    document.getElementById("font-selector").addEventListener("change", changeFont);
+});
 
- </script>
+</script>
 </head>
 <body>
     <h1>掲示板</h1>
@@ -189,7 +189,7 @@
         <option value="Georgia, sans-serif">Georgia</option>
         <option value="Courier New, monospace, sans-serif">Courier New</option>
         <option value="Lusitana, sans-serif">Lusitana</option>
-        
+
     </select>
     <label for="verify">スピ限</label>
     <input type="checkbox" id="verify" name="verify">
@@ -211,4 +211,4 @@
         <p>更新待機中...</p>
     </div>
 </body>
-</html>
+</html>s
